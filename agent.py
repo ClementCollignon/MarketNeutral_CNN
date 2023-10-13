@@ -93,11 +93,6 @@ class Trader(object):
         train_loader = self.prepare_loader_noval()
         loss_train, acc_train = self.train_noval(train_loader)
         return loss_train, acc_train
-    
-    def learn(self, shuffle = True):
-        train_loader, val_loader = self.prepare_loader(shuffle)
-        loss_val, acc_val = self.train(train_loader, val_loader)
-        return loss_val, acc_val
             
     @torch.no_grad()
     def predict(self, state, scale):
@@ -173,12 +168,10 @@ class Trader(object):
 
         #here I fit on the last 5/6 and check on the first 1/6
         train_ds = torch.utils.data.TensorDataset(states[:cut_val], scales[:cut_val], best_actions[:cut_val])
-        train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
         
         val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], best_actions[cut_val:])
-        val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
-
-        return train_loader, val_loader
+        self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
     
     def train_one_epoch(self, train_loader):
         Ngood,Nbad = 0,0
@@ -242,17 +235,16 @@ class Trader(object):
         
         return total_loss/len(val_loader) , total_acc
 
-    def train(self, train_loader, val_loader):
-        
+    def learn(self):
         for epoch in range(self.epochs):
             self.net.train(True)
-            loss_train, acc_train = self.train_one_epoch(train_loader)
+            loss_train, acc_train = self.train_one_epoch(self.train_loader)
             print(f"epoch {epoch}: train loss, acc: {np.round(loss_train,3)}, {np.round(acc_train,3)}")
             self.loss_train.append(loss_train)
             self.acc_train.append(acc_train)
     
             self.net.train(False)
-            loss_val, acc_val = self.check_val(val_loader)
+            loss_val, acc_val = self.check_val(self.val_loader)
             print(f"epoch {epoch}: val    loss, acc: {np.round(loss_val,3)}, {np.round(acc_val,3)}")
             print("____")
             self.loss_val.append(loss_val)

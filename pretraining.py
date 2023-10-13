@@ -4,17 +4,17 @@ import numpy as np
 import time
 
 if __name__ == "__main__":
-    log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\training2.csv"
-    path_NN = "Nets/Net2"
+    log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\trainingnoshuffle55.csv"
+    path_NN = "Nets/Net1"
     days_in_memory = 200
     filter_length = 3
-    batch_size = 16
+    batch_size = 64
     epochs = 1
     holding_time = 1
     observed_candles = 7
     lr = 1e-4
-    dropout = 0.35
-    brain = "Nets/Net2/full_shuffle_epoch99.chkpt"
+    dropout = 0.55
+    brain = "Nets/Net1/full_shuffle_epoch99.chkpt"
 
     with open(log, 'w') as file:
         file.write("#number of candles\thold time\tdoprout\tlr\ttrain loss\ttrain acc\tval loss\tval acc\n")
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     Ndays_skip = int(observed_candles / 7) + 1
     print(f"skip {Ndays_skip} days to have at least {observed_candles} 1h candles in the past")
 
-    Ndays = 200
+    Ndays = 250
 
     counter = 0
     t0 = time.time()
@@ -41,8 +41,9 @@ if __name__ == "__main__":
         Mario.memorize(day_batch)
     print(f"Time to aggregate {Ndays} days:", time.time()-t0)
 
+    Mario.prepare_loader(shuffle = True)
     for i in range(100):
-        Mario.learn(shuffle = True)
+        Mario.learn()
         path = f"{path_NN}/full_shuffle_epoch{i}.chkpt"
         Mario.save(path)
         print("Time to train",time.time()-t0)

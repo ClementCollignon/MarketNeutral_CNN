@@ -80,11 +80,6 @@ class Trader(object):
 
     def memorize(self, batch):
         self.memory.extend(batch)
-    
-
-    def learn(self, shuffle = True):
-        loss_val, dist_val = self.train(self.train_loader, self.val_loader)
-        return loss_val, dist_val
             
     @torch.no_grad()
     def predict(self, state, scale):
@@ -205,17 +200,16 @@ class Trader(object):
         
         return total_loss/len(val_loader) , total_dist
 
-    def train(self, train_loader, val_loader):
-        
+    def learn(self):
         for epoch in range(self.epochs):
             self.net.train(True)
-            loss_train, dist_train = self.train_one_epoch(train_loader)
+            loss_train, dist_train = self.train_one_epoch(self.train_loader)
             print(f"epoch {epoch}: train loss, dist: {np.round(loss_train,4)}, {np.round(dist_train*100,3)}")
             self.loss_train.append(loss_train)
             self.dist_train.append(dist_train)
     
             self.net.train(False)
-            loss_val, dist_val = self.check_val(val_loader)
+            loss_val, dist_val = self.check_val(self.val_loader)
             print(f"epoch {epoch}: val   loss, dist: {np.round(loss_val,4)}, {np.round(dist_val*100,3)}")
             print("____")
             self.loss_val.append(loss_val)
