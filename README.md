@@ -96,10 +96,10 @@ With this settle we now solely vary the number of observed candles and find an o
 We can now train our model.
 
 <p align = "center">
-<img src="images/train_loss_035.PNG" height=160>
-<img src="images/train_acc_035.PNG" height=160>
-<img src="images/train_loss_055.PNG" height=160>
-<img src="images/train_acc_055.PNG" height=160>
+<img src="images/train_loss_035.PNG" height=150>
+<img src="images/train_acc_035.PNG" height=150>
+<img src="images/train_loss_055.PNG" height=150>
+<img src="images/train_acc_055.PNG" height=150>
 </p>
 
 The dropout might be still even too high as the train data underperform the validation one.
