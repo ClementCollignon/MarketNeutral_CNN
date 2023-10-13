@@ -22,6 +22,11 @@ Practically, we have the 1h, 1d and 1week andle charts for the pair of stocks so
 The height is fixed to 144 pixels (so that at least the height allows 4 2x2 maxpools and/or 2 3x3 ones).
 The width will depend on the number of candles we want the CNN to look at.
 
+<p align = "center">
+<img src="images/all_candles.png" height=300>
+<img src="images/tensor_stack.png" height=300>
+</p>
+
 We can note two things.
 First, if we have 10 stocks, we have 90 possible permutations which is good for training (100 days will give us 9000 tensors to train on).
 Second, the candles have to be scaled. The scale is set by the one of the two stocks that varies the most on the periode we look at.

@@ -18,6 +18,14 @@ candles1d_pair1 = batch0[1][3]
 candles1wk_pair0 = batch0[1][4]
 candles1wk_pair1 = batch0[1][5]
 
+plt.imshow(candles1h_pair0)
+plt.tight_layout()
+plt.show()
+
+plt.imshow(candles1h_pair1)
+plt.tight_layout()
+plt.show()
+
 plt.imshow(candles1d_pair0)
 plt.tight_layout()
 plt.show()
