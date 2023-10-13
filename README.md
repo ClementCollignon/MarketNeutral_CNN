@@ -106,9 +106,9 @@ The dropout might be still even too high as the train data underperform the vali
 
 #### Playing on 50 days to tune memory
 
-Now we use the 50 remaining days of the year to do a mock play.
+Now we use the 50 remaining days of the year to do a mock play (see [script](trading_opti.py)).
 The goal here is to optimize the parameters to get the best Sharpe ratio in a more concrete situation.
-Here we only train the last fully convoluted layer as the size of the memory will be limited.
+This time, we only train the last fully convoluted layer as the size of the memory will be limited.
 The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times sqrt(50) to give a yearly like Sharpe ratio (even if that's not entirely accurate).
 50 days is a short periode of time to evaluate our models. But it takes already 10 minutes per play on the hardware I have.
 We could finetune during this step the dropout, learning rate but also the memory size, and the number of epochs for training each day.
