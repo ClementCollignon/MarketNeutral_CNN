@@ -146,7 +146,7 @@ Now the maybe more obvious issue is that the output of the CNN is too Manichean.
 If the relative variation between the stocks is small training will still force the NN to choose a side and that might be detrimental. We want the neuralnet to be undecided when variation is small and certain when variation is large.
 We can try to address that problematic by outputting the relative variation between the stocks instead of the best action to take.
 
-## Trying to extract relative performance
+## Predicting relative performance
 
 Let's call $\Delta x = x_1 - x_0$ the relative variation between stocks 1 and 0. With $x_1$ and $x_0$ the variations of stocks 1 and 0.
 In principle, $\Delta x$ is in the interval $[-\infty, +\infty]$.
@@ -154,7 +154,7 @@ This is not a great range for a neural network output, we hence need to project 
 We can use a $P(\Delta x) = 1/2 \times (1 + \tanh(slope\times \Delta x))$ for this purpose, but what about the slope?
 If the slope is too steep, all projections will be either 0 or 1. If it's too gentle then all projections will be close to 0.5.
 
-We should compare our function with the cumulative distribution function of the relative daily variation between two stocks. Of course, it will vary depending on the pair of stocks chosen. A slope of 10 gives us a good compromise and let us the hope to find variations in the -0.1, 0.1 range. The figure below compares that function with the CDF of the relative daily variation on 4 pairs of stocks.
+We should compare our function with the cumulative distribution function of the relative daily variation between two stocks. Of course, it will vary depending on the pair of stocks chosen. A slope of 10 gives us a good starting point and let us the hope to find variations in the -0.1, 0.1 range. We can vary that parameter around that later on. The figure below compares that function with the CDF of the relative daily variation on 4 pairs of stocks.
 
 <p align = "center">
 <img src="images/CDF.PNG" height=250>
@@ -163,3 +163,5 @@ We should compare our function with the cumulative distribution function of the 
 We can take the same NN, and apply a softmax to the output to get a value that belongs to [0,1]. We can then compare this value to the real $\Delta x$ which is also between 0 and 1.
 We want optimally a loss that will gives us 0 when the softmax is equal to the relative variation and infinity when the distance between the two is the largest (i.e. 1). Taking the log,
 $-\ln(1-|prediction - P(\Delta x)|)$ we get all the good properties.
+
+We can implement a variant of the agent in [agent_variation.py](agent_variation.py) with the custom loss function and the two function $P(\Delta x)$ and $P^{-1}(\Delta x)$ that will allow us to go back and forth between the convenient space $[0,1]$ for our CNN and the 'relative variation' space that has better meaning to us. The [adapted wrapper](wrapper_variation.py) now returns the relative variation between a pair of stocks instead of the 0,1 logit to indicate which stock will increase the most.

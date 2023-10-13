@@ -12,14 +12,14 @@ import datetime
 
 
 class Trader(object):
-    def __init__(self, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, pretrained = False, metadata = None):
+    def __init__(self, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, frozen = False, metadata = None):
         
         self.holding_time = holding_time #days
         self.metadata = metadata
 
         self.setup_market(number_of_observed_candles)
         self.setup_memory(days_in_memory)
-        self.setup_brain(filter_length, dropout, learning_rate, batch_size, epochs, pretrained)
+        self.setup_brain(filter_length, dropout, learning_rate, batch_size, epochs, frozen)
         self.setup_wallet()
         
 
@@ -33,7 +33,7 @@ class Trader(object):
         self.memory_size = len(self.market.pairs) * days_in_memory
         self.memory = deque(maxlen = self.memory_size)
 
-    def setup_brain(self, filter_length, dropout, learning_rate, batch_size, epochs, pretrained):
+    def setup_brain(self, filter_length, dropout, learning_rate, batch_size, epochs, frozen):
         self.epochs = epochs
         self.batch_size = batch_size
         self.state_dim = (6, 144, self.number_of_observed_candles*4)
@@ -42,7 +42,7 @@ class Trader(object):
 
         self.filter_length = filter_length
         self.device = "cuda"
-        self.net = AlexNetLike(self.state_dim, self.action_dim, filter_length, dropout, pretrained).float()
+        self.net = AlexNetLike(self.state_dim, self.action_dim, filter_length, dropout, frozen).float()
         self.net = self.net.to(device=self.device)
         self.lr = learning_rate
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=self.lr, weight_decay = 1e-5)

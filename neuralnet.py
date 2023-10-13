@@ -6,7 +6,7 @@ seed = 42
 torch.manual_seed(seed)
 
 class AlexNetLike(nn.Module):
-    def __init__(self, input_dim, output_dim, filter_len, dropout = 0.5, pretrained = False):
+    def __init__(self, input_dim, output_dim, filter_len, dropout = 0.5, frozen = False):
         super().__init__()
         c, h, w = input_dim
 
@@ -31,7 +31,7 @@ class AlexNetLike(nn.Module):
         self.fc3 = nn.Linear(256, output_dim)
         self.drop = nn.Dropout(p = dropout)
 
-        if pretrained:
+        if frozen:
             self.conv1.requires_grad_(False)
             self.conv2.requires_grad_(False)
             self.fc1.requires_grad_(False)

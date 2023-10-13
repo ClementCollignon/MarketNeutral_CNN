@@ -178,7 +178,7 @@ class Wrapper(object):
 
         return state
 
-    def get_best_actions(self, day1, day2):
+    def get_relative_variations(self, day1, day2):
         candles1 = self.candles_1h[self.candles_1h.index.date == day1]
         candles2 = self.candles_1h[self.candles_1h.index.date == day2]
 
@@ -192,28 +192,28 @@ class Wrapper(object):
         variation = ( day2_value - day1_value ) / day1_value
         variation = variation.values
 
-        best_action = []
+        relative_variation = []
         for pair in self.pairs:
-            best_action.append(variation[pair[1]]-variation[pair[0]])
+            relative_variation.append(variation[pair[1]]-variation[pair[0]])
         
-        return torch.tensor(best_action), periode
+        return torch.tensor(relative_variation), periode
 
-    def get_state_best_action(self, day1, day2, Troubleshoot = False):
+    def get_state_relative_variation(self, day1, day2, Troubleshoot = False):
         batch = []
         states, scales, periode_1h, periode_1d, periode_1wk = self.get_states(day1)
-        best_action, periode_best_action = self.get_best_actions(day1, day2)
+        relative_variation, periode_relative_variation = self.get_relative_variations(day1, day2)
 
         if Troubleshoot:
             print("---")
-            print(f"variation is taken between Close of 1h candle at {periode_best_action[0]},")
-            print(f"and Close of 1h candle starting at {periode_best_action[1]} \n")
+            print(f"variation is taken between Close of 1h candle at {periode_relative_variation[0]},")
+            print(f"and Close of 1h candle starting at {periode_relative_variation[1]} \n")
             print(f"1h candle plate between:\n1: {periode_1h[0]}\n2: {periode_1h[1]} \n")
             print(f"1d candle plate between:\n1: {periode_1d[0]}\n2: {periode_1d[1]} \n")
             print(f"1wk candle plate between:\n1: {periode_1wk[0]}\n2: {periode_1wk[1]} \n")
             print("(add 1h, 1d and 7d to last candles respectively to get close time of last candle)")
             print("---")
         
-        for p, st, sc, ba in zip(self.pairs, states, scales, best_action):
+        for p, st, sc, ba in zip(self.pairs, states, scales, relative_variation):
             batch.append((p, st, sc, ba))
     
         return batch
