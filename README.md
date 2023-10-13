@@ -1,8 +1,11 @@
 # Can a Convolutional Neural Network do Technical Analysis?
 
-Technical Analysis to predict stock market moves has always looked like astrology to me.
-But TA has a huge amount of afficionados, so there has to be some truth to it, even if by self realisation (if enough people believe that the "cup and handle" will give you a rise in price then you will at some point get some upward pressure).
-Even Burry ultimately relies on supports, in his own words: "With the market rallying since just prior to the start of the Strategy Lab, I must admit that many of the stocks I wanted to write about have already appreciated some. This is problematic because even if I like a stock fundamentally, I am rarely willing to buy more than 15% above technical support. I also generally use broken support as an exit point."
+Technical Analysis to predict stock market moves has always looked like astrology to me.  
+But TA has quite the large dan base, so there has to be some truth to it, even if by self realisation (if enough people believe that the "cup and handle" will give you a rise in price then you will at some point get some upward pressure).  
+Even Burry ultimately relies on supports, in his own words:  
+"With the market rallying since just prior to the start of the Strategy Lab, I must admit that many of the stocks I wanted to write about have already appreciated some.
+This is problematic because even if I like a stock fundamentally, I am rarely willing to buy more than 15% above technical support.
+I also generally use broken support as an exit point."
 
 The idea is then simple, can feed a candle chart to a CNN and output if we should buy now or not.
 
