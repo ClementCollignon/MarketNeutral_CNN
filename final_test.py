@@ -4,8 +4,8 @@ import numpy as np
 import time
 
 if __name__ == "__main__":
-    brain_Luigi = "Net11/full_shuffle_epoch25.chkpt"
-    brain_Mario = "Net22/full_shuffle_epoch25.chkpt"
+    brain_Luigi = "Net/Net11/full_shuffle_epoch25.chkpt"
+    brain_Mario = "Net/Net22/full_shuffle_epoch25.chkpt"
     
     number_of_days_play = 450
 

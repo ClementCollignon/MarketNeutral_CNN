@@ -5,7 +5,7 @@ import time
 
 if __name__ == "__main__":
     log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\training2.csv"
-    path_NN = "Net2"
+    path_NN = "Net/Net2"
     days_in_memory = 200
     filter_length = 3
     batch_size = 16

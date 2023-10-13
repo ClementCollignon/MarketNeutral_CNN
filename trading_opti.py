@@ -96,7 +96,7 @@ def run(number_of_days_play, days_in_memory, lr, dropout, brain):
             Mario.epochs = 2
 
 if __name__ == "__main__":
-    brains = ["Net2/full_shuffle_epoch99.chkpt","Net1/full_shuffle_epoch99.chkpt"]
+    brains = ["Nets/Net2/full_shuffle_epoch99.chkpt","Net1/full_shuffle_epoch99.chkpt"]
     number_of_days_play = 50
     
     N = 1
