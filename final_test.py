@@ -4,13 +4,13 @@ import numpy as np
 import time
 
 if __name__ == "__main__":
-    brain_Luigi = "Net/Net11/full_shuffle_epoch25.chkpt"
-    brain_Mario = "Net/Net22/full_shuffle_epoch25.chkpt"
+    brain_Luigi = "Nets/Net1/full_shuffle_epoch69.chkpt"
+    brain_Mario = "Nets/Net2/full_shuffle_epoch90.chkpt"
     
     number_of_days_play = 450
 
     filter_length = 3
-    batch_size = 16
+    batch_size = 64
     epochs = 10
     holding_time = 1
     observed_candles = 7
@@ -21,17 +21,17 @@ if __name__ == "__main__":
 
     day0 = 255
 
-    Mario = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Mario, lr, batch_size, epochs, pretrained = True, metadata = (days_in_memory, lr, dropout_Mario, brain_Mario))
+    Mario = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Mario, lr, batch_size, epochs, frozen = True, metadata = (days_in_memory, lr, dropout_Mario, brain_Mario))
     Mario.load(brain_Mario)
     wallet_Mario = [Mario.wallet]
 
     time.sleep(5) #to allow log to change name
-    Luigi = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Luigi, lr, batch_size, epochs, pretrained = True, metadata = (days_in_memory, lr, dropout_Luigi, brain_Luigi))
+    Luigi = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Luigi, lr, batch_size, epochs, frozen = True, metadata = (days_in_memory, lr, dropout_Luigi, brain_Luigi))
     Luigi.load(brain_Luigi)
     wallet_Luigi = [Luigi.wallet]
 
     time.sleep(5) #to allow log to change name
-    Concensus = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Luigi, lr, batch_size, epochs, pretrained = True, metadata = (days_in_memory, lr, dropout_Luigi, brain_Luigi))
+    Concensus = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout_Luigi, lr, batch_size, epochs, frozen = True, metadata = (days_in_memory, lr, dropout_Luigi, brain_Luigi))
     wallet_Concensus = [Concensus.wallet]
 
     x = [day0 - 1 ]

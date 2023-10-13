@@ -98,6 +98,8 @@ We can now train our model.
 <p align = "center">
 <img src="images/pretrain_loss_035.PNG" height=150>
 <img src="images/pretrain_acc_035.PNG" height=150>
+<img src="images/pretrain_loss_055.PNG" height=150>
+<img src="images/pretrain_acc_055.PNG" height=150>
 </p>
 
 #### Playing on 50 days to tune memory

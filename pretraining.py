@@ -16,14 +16,14 @@ if __name__ == "__main__":
     dropout = 0.55
     brain = "Nets/Net1/full_shuffle_epoch99.chkpt"
 
-    with open(log, 'w') as file:
-        file.write("#number of candles\thold time\tdoprout\tlr\ttrain loss\ttrain acc\tval loss\tval acc\n")
+    # with open(log, 'w') as file:
+    #     file.write("#number of candles\thold time\tdoprout\tlr\ttrain loss\ttrain acc\tval loss\tval acc\n")
 
 
     metadata = (days_in_memory, lr, dropout, brain)
 
     Mario = Trader(holding_time, observed_candles, days_in_memory, filter_length, dropout, lr, batch_size, epochs, metadata = metadata)
-    # Mario.load(brain)
+    Mario.load(brain)
     days = Mario.market.get_available_days()
     Ndays_skip = int(observed_candles / 7) + 1
     print(f"skip {Ndays_skip} days to have at least {observed_candles} 1h candles in the past")
