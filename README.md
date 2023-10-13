@@ -23,8 +23,8 @@ The height is fixed to 144 pixels (so that at least the height allows 4 2x2 maxp
 The width will depend on the number of candles we want the CNN to look at.
 
 <p align = "center">
-<img src="images/all_candles.PNG" height=300>
-<img src="images/tensor_stack.PNG" height=300>
+<img src="images/all_candles.PNG" height=250>
+<img src="images/tensor_stack.PNG" height=250>
 </p>
 
 We can note two things.  
