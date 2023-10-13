@@ -44,9 +44,9 @@ The achitecture of the network is shown below, you can also ave a look at the [c
 ## How do we play?
 
 #### We have an [agent](agent.py) with the following characteritics:  
-1. A memory to store the stacks of candle charts and the best actions that should be taken for each pair of stocks.
-2. A [neural network](neuralnet.py) that he can train against his memory, and use to predict the best action to take 
-3. The agent is connected to a [wrapper](wrapper.py) (the 'market') that feeds him the stacks of candle charts.
++ A memory to store the stacks of candle charts and the best actions that should be taken for each pair of stocks.
++ A [neural network](neuralnet.py) that he can train against his memory, and use to predict the best action to take 
++ The agent is connected to a [wrapper](wrapper.py) (the 'market') that feeds him the stacks of candle charts.
 
 #### The process is then as follow:
 1. The agent observes the stacks of the previous days and the variations of each stocks.  
@@ -60,12 +60,12 @@ The memory may have a maximum length.
 
 ## Some obvious flaws
 
-Dividends are not taken into account in all of this. And to make things even more sketchy, they are included in yfinance 1d and 1week candles but not in the hourly ones.  
-We are obviously oblivious to any news: unexcpected event, earning days ... (we could maybe avoid holding across earning days to mitigate that).
-It is assumed that all the agent orders at bid/ask values equals to the value of the stock at 10:30am reported from yfinance passed, this is not a given.  
-There is of course no consideration on the fundamentals.  
-The cost of each transaction is 0. Which at the very least can't be the case for a short position.  
-Market mood varies widely and investor sentiments will change with time. 
++ Dividends are not taken into account in all of this. And to make things even more sketchy, they are included in yfinance 1d and 1week candles but not in the hourly ones.
++ We are obviously oblivious to any news: unexcpected event, earning days ... (we could maybe avoid holding across earning days to mitigate that).
+It is assumed that all the agent orders at bid/ask values equals to the value of the stock at 10:30am reported from yfinance passed, this is not a given.
++ There is of course no consideration on the fundamentals.  
++ The cost of each transaction is 0. Which at the very least can't be the case for a short position.  
++ Market mood varies widely and investor sentiments will change with time. 
 Reaction to a given chart won't be the same in September 2021 and March 2022 (the [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed) is a perfect example).
 
 To mitigate this last issue we will put a limit on the size of the memory and train only the last fully convoluted layer during play time. More details on this are given below.
