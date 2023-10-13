@@ -102,7 +102,7 @@ We can now train our model.
 <img src="images/train_acc_055.PNG" height=150>
 </p>
 
-The dropout might be still even too high as the train data underperform the validation one. ( Nop just realize a mistake in the code that reshuffles at every epoch ...)
+The dropout might be still even too high as the train data underperform the validation one. (Nop just realize a mistake in the code that reshuffles at every epoch ... That also explaines why the training was so long).
 
 #### Playing on 50 days to tune memory
 

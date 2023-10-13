@@ -81,9 +81,9 @@ class Trader(object):
     def memorize(self, batch):
         self.memory.extend(batch)
     
+
     def learn(self, shuffle = True):
-        train_loader, val_loader = self.prepare_loader(shuffle)
-        loss_val, dist_val = self.train(train_loader, val_loader)
+        loss_val, dist_val = self.train(self.train_loader, self.val_loader)
         return loss_val, dist_val
             
     @torch.no_grad()
@@ -129,12 +129,10 @@ class Trader(object):
 
         #here I fit on the last 2/3 and check on the first 1/3
         train_ds = torch.utils.data.TensorDataset(states[:cut_val], scales[:cut_val], relative_variations[:cut_val])
-        train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
         
         val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], relative_variations[cut_val:])
-        val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
-
-        return train_loader, val_loader
+        self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
     
     def train_one_epoch(self, train_loader):
         total_loss = 0
