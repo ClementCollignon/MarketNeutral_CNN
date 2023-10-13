@@ -113,6 +113,14 @@ The Sharpe ratio is then computed as the mean over the standard deviation of the
 50 days is a short periode of time to evaluate our models. But it takes already 10 minutes per play on the hardware I have.
 We could finetune during this step the dropout, learning rate but also the memory size, and the number of epochs for training each day.
 
+<p align = "center">
+<img src="images/sharpe.png" height=250>
+</p>
+The data (which is here aggregated and averaged for each x axis value) is extremely noisy, maybe because of the short 50 days periode.
+All in all keeping 15 days in memory might be a reasonnable.
+It's quite noteworthy that the Sharpe ratio declines with increasing memory size. The decline after 15 days may infere a typical time scale of 3 weeks for market mood? But once again the noise level is quite high here.
+
+
 ## Big leap, test with chosen parameters
 
 MEH.
