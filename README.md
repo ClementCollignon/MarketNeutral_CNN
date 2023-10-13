@@ -1,8 +1,8 @@
 # Can a Convolutional Neural Network do Technical Analysis?
 
 Technical Analysis to predict stock market moves has always looked like astrology to me.  
-But TA has quite the large dan base, so there has to be some truth to it, even if by self realisation (if enough people believe that the "cup and handle" will give you a rise in price then you will at some point get some upward pressure).  
-Even Burry ultimately relies on supports, in his own words:  
+But TA has quite the large fan base, so there has to be some truth to it, even if by self realisation (if enough people believe that the "cup and handle" will give you a rise in price then you will at some point get some upward pressure).  
+Even Burry ultimately relies on supports; in his own words:  
 "With the market rallying since just prior to the start of the Strategy Lab, I must admit that many of the stocks I wanted to write about have already appreciated some.
 This is problematic because even if I like a stock fundamentally, I am rarely willing to buy more than 15% above technical support.
 I also generally use broken support as an exit point."
@@ -76,6 +76,11 @@ Naturally the CDF comes to mind.
 Gives a optimal projected spacing on the 0,1 interval for all my states.
 Indeed if too sharp, all 0 or all 1.
 If not enough sharp, all projected on ~0.5.
+
+Let's take the same NN, at the output, two values to which I take the softmax which gives a two values whose some = 1 and that belongs to [0,1]. We can look only at the first of those two.
+My loss whould compare this value to the projected relative performance which is also between 0 and 1.
+To have a good gradient for my backpropagation during training, I want optimally a loss that will gives me 0 when the softmax is equal to the relative variation and infinity when it's the distance between the two is the largest (i.e. 1).
+ln(1-|softmax - projected relative variation|) has all the good properties. 
 
 
 
