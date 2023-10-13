@@ -11,16 +11,26 @@ The idea is then simple, can I feed a few candle charts to a CNN and get has an 
 As I want to have a market neutral strategy, let's reformulate:  
 Can I feed the candle charts for 'stock0' and 'stock1' to a CNN and output 0 (1) if stock0 (stock1) outperforms?
 
-
 ### The idea
 
-Chose sector and the 10 most traded stocks (see blablabla.py for data extraction).
-Transform the OCHL data into candles charts for 1h, 1d, 1wk (see wrapper) with n candles (parameter).
-Stack a pair together (90 possible permutations => good for training).
-The candles have to be scaled => scaling should also be fed to the CNN.
-Feed them to a CNN (see below and neuralnet.py).
-The CNN output 0 or 1.
-I chose to open/close positions at 10:30am at the close of the first 1h candle of the day.
+Let's start by chosing a sector, in our case, residential REIT stocks listed in the US.
+We then select the 10 most traded stocks and download the historical data with Open, Close, High, Low and Volume (OCHLV) values for the one hour, one day, and one week candles ([data_extraction.py](data_extraction.py) helps with the task).
+
+We can then translate these OCHLV data into visual candle charts, in the form of torch tensors, as in the figure below. 
+And we can stack those tensors for a pair a stock.
+Practically, we have the 1h, 1d and 1week andle charts for the pair of stocks so that we end up with 6 channels in pytorch nomenclature.
+The height is fixed to 144 pixels (so that at least the height allows 4 2x2 maxpools and/or 2 3x3 ones).
+The width will depend on the number of candles we want the CNN to look at.
+
+We can note two things.
+First, if we have 10 stocks, we have 90 possible permutations which is good for training (100 days will give us 9000 tensors to train on).
+Second, the candles have to be scaled. The scale is set by the one of the two stocks that varies the most on the periode we look at.
+We need to give this scaling factor to the CNN to give it chance at infering the magnitude of the variation.
+We hence feed the stack of candles and the scaling values to the CNN.
+The CNN will output 0 or 1 depending on weither 0 or 1 is the one increasing the most over the next 24h.
+We open/close positions at 10:30am at the close of the first 1h candle of the day (this could be varied, and should be considered a parameter).
+The achitecture of the network is shown below, you can also ave a look at the [code](neuralnet.py) helps with the task
+
 
 ### How do we play?
 
