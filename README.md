@@ -83,6 +83,26 @@ Once again, because of the limited amount of time we will fix the holding time t
 #### Pretraining on 200 days
 
 We cut those 200 days into a training and validation set. And we have two options. Either shuffling before cutting the dataset or no. If we don't shuffle beforehand, training and validation will be on different periods of time, and we will be subjected to this shifting investor mood issue stated above. It's interresting to see though the night and day difference with and without shuffling the data.
+See below some examples with the loss ploted as a function of the dropout for the shuffled and unshuffled cases. The unshuffled validation data cannot go below ln(2).
+
+<p align = "center">
+<img src="images/unshuffled_dropouts.PNG" height=250>
+<img src="images/shuffled_dropouts.PNG" height=250>
+</p>
+
+By varying randomly the dropout, learning rate and the number of observed candles, we look for the optimal parameters.
+Based on the above right figure, we go for a the highest possible drop rate (dr = 0.55) to introduce as much noise as possible and avoid overfitting on particular features. We will also train another network with a lower dropout rate (dr = 0.35) as 0.55 might be overkill. The same way we also get an optimal learning rate of about 1.5e-4.  
+With this settle we now solely vary the number of observed candles and find an optimal number that seems to be around 8.
+We can now train our model.
+
+<p align = "center">
+<img src="images/train_loss_035.PNG" height=170>
+<img src="images/train_acc_035.PNG" height=170>
+<img src="images/train_loss_055.PNG" height=170>
+<img src="images/train_acc_055.PNG" height=170>
+</p>
+
+The dropout might be still even too high as the train data underperform the validation one.
 
 #### Playing on 50 days to tune memory
 
