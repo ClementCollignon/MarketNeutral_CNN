@@ -158,5 +158,5 @@ We should compare our function with the cumulative distribution funtion of the r
 </p>
 
 We can take the same NN, and apply a softmax to the output to get a value that belongs to [0,1]. We can then compare this value to the real $\Delta x$ which is also between 0 and 1.
-To have a good gradient for my backpropagation during training, we want optimally a loss that will gives us 0 when the softmax is equal to the relative variation and infinity when the distance between the two is the largest (i.e. 1). Taking the log,
-$\ln(1-|prediction - P(\Delta x)|)$ we get all the good properties.
+We want optimally a loss that will gives us 0 when the softmax is equal to the relative variation and infinity when the distance between the two is the largest (i.e. 1). Taking the log,
+$-\ln(1-|prediction - P(\Delta x)|)$ we get all the good properties.

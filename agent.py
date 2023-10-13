@@ -10,6 +10,14 @@ import itertools
 import os
 import datetime
 
+    
+def loss_custom(prediction, target):
+    epsilon = 1e-6 #to avoid issues in 0
+    pred = torch.nn.Softmax(0)(prediction)
+    dist = torch.abs(pred-target)
+    loss = -torch.log(1-dist+epsilon)
+    return loss
+
 
 class Trader(object):
     def __init__(self, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, pretrained = False, metadata = None):
@@ -73,23 +81,10 @@ class Trader(object):
         self.setup_brain(self.filter_length, dropout, learning_rate, self.batch_size, self.epochs)
 
     def observe_past(self, day_open_position, day_close_position, Troubleshoot = False):
-        """ Agent is on day0
-        day2 to day1 = plate
-        day1 to day0 = observed variation of stocks
-        day0 - day1 = holding time
-        day2 - day1 = number of days in plates
-        This should return the N(N-1) plates pairs
-        This should return the N(N-1) scaling values
-        This should return the variation of each stock between day1 and day0
-        """
         batch = self.market.get_state_best_action(day_open_position, day_close_position, Troubleshoot)
         return batch
 
     def observe_present(self, day):
-        """Agent is on day 0
-        Get plates for the N(N-1) pairs with associated scaling values.
-        Get also the price action in the morning 
-        """
         plates, scales = self.market.get_states(day)
         pairs = self.market.pairs
 
