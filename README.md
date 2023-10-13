@@ -41,28 +41,34 @@ The achitecture of the network is shown below, you can also ave a look at the [c
 <img src="images\neuralnet.PNG" width = 700>
 </p>
 
-
 ## How do we play?
 
-Agent with memory and a neural net connected to a market that feeds him the candle charts.
-Agent observe the stacks of the previous days and the variations of each stocks.
-Memory of agent can have a finite size.
-Agent learn from that.
-Agent observe the 90 stacks of the day associated to the 10 stocks.
-For each stacks we predict which one will be outperforming over one day.
-Then we proceed to a vote. Each outpermorming of a pair get a point.
-Once the 90 points are distributed we go long on the one with most points with half of the wallet and we open an equivalent short position on the one with the list point.
-(We could go 100% of the wallet, but let's say we want to play it safe.)
-Then we move to the next day, close both long and short positions and start again, pushing one more day in the memory.
+#### We have an [agent](agent.py) with the following characteritics:  
+1. A memory to store the stacks of candle charts and the best actions that should be taken for each pair of stocks.
+2. A [neural network](neuralnet.py) that he can train against his memory, and use to predict the best action to take 
+3. The agent is connected to a [wrapper](wrapper.py) (the 'market') that feeds him the stacks of candle charts.
+
+#### The process is then as follow:
+1. The agent observes the stacks of the previous days and the variations of each stocks.  
+2. The agent train the neural network against its memory.
+3. The agent observes the stacks of the day associated to the 10 stocks (reminder that there are 90 stacks in total for a given day).
+4. The agent predict for each pair of stock which one will be outperforming and give one point for the best stock each time.
+5. The agent goes long with 50% of its wallet on the stock with the most points and opens an equivalent short position on the stock with the least.
+(He could go 100% of the wallet, but let's say he wants to play it safe.)
+6. Then he moves on to the next day, close both long and short positions and starts again, pushing one more day in the memory.
+The memory may have a maximum length.
 
 ## Some obvious flaws
 
-Dividend
-News
-Order passed?
-no fundamental
-cost of transaction
-market mood varies (the fear index) ... we will try to mitigate that one.
+Dividends are not taken into account in all of this. And to make things even more sketchy, they are included in yfinance 1d and 1week candles but not in the hourly ones.  
+We are obviously oblivious to any news: unexcpected event, earning days ... (we could maybe avoid holding across earning days to mitigate that).
+It is assumed that all the agent orders at bid/ask values equals to the value of the stock at 10:30am reported from yfinance passed, this is not a given.  
+There is of course no consideration on the fundamentals.  
+The cost of each transaction is 0. Which at the very least can't be the case for a short position.  
+Market mood varies widely and investor sentiments will change with time. 
+Reaction to a given chart won't be the same in September 2021 and March 2022 (the [Fear & Greed Index](https://www.cnn.com/markets/fear-and-greed) is a perfect example).
+
+To mitigate this last issue we will put a limit on the size of the memory and train only the last fully convoluted layer during play time. More details on this are given below.
 
 ## Training and (hyper)parameters tuning
 
