@@ -119,7 +119,7 @@ class Trader(object):
         scales = scales.to(device = self.device)
         best_actions = best_actions.type(torch.long).to(device = self.device).squeeze()
         prediction = self.net(states, scales)
-        prediction = torch.argmax(torch.nn.Softmax(0)(prediction),1)
+        prediction = torch.argmax(torch.nn.Softmax(1)(prediction),1)
 
         acc = 0
         if check_pred:
@@ -204,7 +204,7 @@ class Trader(object):
 
             total_loss += loss.item()
 
-            prediction = torch.argmax(torch.nn.Softmax(0)(prediction),1)
+            prediction = torch.argmax(torch.nn.Softmax(1)(prediction),1)
 
             Ngood+=len(prediction[prediction == best_action])
             Nbad+=len(prediction[prediction != best_action])
@@ -234,7 +234,7 @@ class Trader(object):
             
             total_loss += loss.item()
 
-            prediction = torch.argmax(torch.nn.Softmax(0)(prediction),1)
+            prediction = torch.argmax(torch.nn.Softmax(1)(prediction),1)
             Ngood+=len(prediction[prediction == best_action])
             Nbad+=len(prediction[prediction != best_action])
 
