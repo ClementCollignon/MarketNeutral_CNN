@@ -5,7 +5,7 @@ import time
 
 if __name__ == "__main__":
     log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\training2.csv"
-    path_NN = "Net/Net2"
+    path_NN = "Nets/Net2"
     days_in_memory = 200
     filter_length = 3
     batch_size = 16
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     observed_candles = 7
     lr = 1e-4
     dropout = 0.35
-    brain = "Net2/full_shuffle_epoch99.chkpt"
+    brain = "Nets/Net2/full_shuffle_epoch99.chkpt"
 
     with open(log, 'w') as file:
         file.write("#number of candles\thold time\tdoprout\tlr\ttrain loss\ttrain acc\tval loss\tval acc\n")
