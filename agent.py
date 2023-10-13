@@ -10,14 +10,6 @@ import itertools
 import os
 import datetime
 
-    
-def loss_custom(prediction, target):
-    epsilon = 1e-6 #to avoid issues in 0
-    pred = torch.nn.Softmax(0)(prediction)
-    dist = torch.abs(pred-target)
-    loss = -torch.log(1-dist+epsilon)
-    return loss
-
 
 class Trader(object):
     def __init__(self, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, pretrained = False, metadata = None):
