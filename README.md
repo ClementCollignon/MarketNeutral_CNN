@@ -165,3 +165,14 @@ We want optimally a loss that will gives us 0 when the softmax is equal to the r
 $-\ln(1-|prediction - P(\Delta x)|)$ we get all the good properties.
 
 We can implement a variant of the agent in [agent_variation.py](agent_variation.py) with the custom loss function and the two function $P(\Delta x)$ and $P^{-1}(\Delta x)$ that will allow us to go back and forth between the convenient space $[0,1]$ for our CNN and the 'relative variation' space that has better meaning to us. The [adapted wrapper](wrapper_variation.py) now returns the relative variation between a pair of stocks instead of the 0,1 logit to indicate which stock will increase the most.
+
+### Hyperparameters tuning
+
+We can start by tuning the hyper parameters. We apply the same procdure, chosing random values of learning rate, dropout and slope at each iteration.
+<p align = "center">
+<img src="images/tune_lr.PNG" height=175>
+<img src="images/tune_dropout.PNG" height=175>
+<img src="images/tune_slope.PNG" height=175>
+</p>
+
+We chose a learning rate of $5.5 10^{-5}$ dropout of 0.20 and a slope of 8.
