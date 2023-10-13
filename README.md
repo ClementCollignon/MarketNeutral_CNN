@@ -116,19 +116,32 @@ We could finetune during this step the dropout, learning rate but also the memor
 <p align = "center">
 <img src="images/sharpe.png" height=250>
 </p>
-The data (which is here aggregated and averaged for each x axis value) is extremely noisy, maybe because of the short 50 days periode.
+The data (which is here aggregated and averaged for each x axis value) is extremely noisy, maybe because of the short 50 days periode. Some run showed satisfying Sharpe ratios above 2, but it can be luck, given the noise.
 All in all keeping 15 days in memory might be a reasonnable.
 It's quite noteworthy that the Sharpe ratio declines with increasing memory size. The decline after 15 days may infere a typical time scale of 3 weeks for market mood? But once again the noise level is quite high here.
 
-
 ## Big leap, test with chosen parameters
 
-MEH.
-More tuning with longer holding time and different filter length?
-How to get a CNN that is better at generalizing? Scale down or dramattically scale up?
-Try to train without shuffle this time and fine tune with this. 
-The output is too manichean, if the relative variation between the stocks is negligible (which should happen often?) training will force the NN to chose a side. This favorise fiiting situations that are not interresting.
-Let's try to mitigate that.
+Finally we set our tuned parameters and start to play.
+We use both pretrained models with dropout rates of 0.35 and 0.55.
+These where retrained on the whole 250 days training set.
+The code for the final test is [here](final_test.py).
+The result is shown below.
+
+<p align = "center">
+<img src="images/final_test.PNG" height=250>
+</p>
+
+It is quite anticlimatic. It is still interresting to see that the network trained with the larger dropout has a (very) slight edge.
+
+Now one can wonder what could have been done better.
+We could go back to the first step and test way more to get more statistic. Particularly in the second training phase, using a time span of a year should help.
+Playing with the other parameters could also help (holding time, filter length ...).
+Using another architecture is another avenue, by either scaling down or scaling up to avoid overfitting (seems that both can work).
+
+Now the maybe more obvious issue is that the output of the CNN is too manichean.
+If the relative variation between the stocks is small training will still force the NN to chose a side and that might be detrimental. We want the neuralnet to be indecided when variation is small and certain when variation is large.
+We can try to address that problematic by outputting the relative variation between the stocks instead of the best action to take.
 
 ## Trying to extract relative performance
 
