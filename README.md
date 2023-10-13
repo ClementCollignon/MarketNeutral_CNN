@@ -7,21 +7,77 @@ Even Burry ultimately relies on supports, in his own words:
 This is problematic because even if I like a stock fundamentally, I am rarely willing to buy more than 15% above technical support.
 I also generally use broken support as an exit point."
 
-The idea is then simple, can feed a candle chart to a CNN and output if we should buy now or not.
+The idea is then simple, can I feed a few candle charts to a CNN and get has an output if I should buy now or not.  
+As I want to have a market neutral strategy, let's reformulate:  
+Can I feed the candle charts for 'stock0' and 'stock1' to a CNN and output 0 (1) if stock0 (stock1) outperforms?
 
-Why not give some statistical analysis of it through Conv Neural Network?
-Idea is then the following:
-    Create plates showing candles for the last x hours, last x days and last x weeks.
-    Give this plates for two stocks to a convulotional neural network
-    The CNN will give as an output which stock is the most favorable to buy
 
-Some notes on the fear and greed index.
+### The idea
 
-### Requirements
+Chose sector and the 10 most traded stocks (see blablabla.py for data extraction).
+Transform the OCHL data into candles charts for 1h, 1d, 1wk (see wrapper) with n candles (parameter).
+Stack a pair together (90 possible permutations => good for training).
+The candles have to be scaled => scaling should also be fed to the CNN.
+Feed them to a CNN (see below and neuralnet.py).
+The CNN output 0 or 1.
+I chose to open/close positions at 10:30am at the close of the first 1h candle of the day.
 
-NumPy 1.15.4, Pillow 5.3.0, PyQt 5.9.2, SciPy 1.1.0, scikit-image 0.16.2
+### How do we play?
 
-### Usage
+Agent with memory and a neural net connected to a market that feeds him the candle charts.
+Agent observe the stacks of the previous days and the variations of each stocks.
+Memory of agent can have a finite size.
+Agent learn from that.
+Agent observe the 90 stacks of the day associated to the 10 stocks.
+For each stacks we predict which one will be outperforming over one day.
+Then we proceed to a vote. Each outpermorming of a pair get a point.
+Once the 90 points are distributed we go long on the one with most points with half of the wallet and we open an equivalent short position on the one with the list point.
+(We could go 100% of the wallet, but let's say we want to play it safe.)
+Then we move to the next day, close both long and short positions and start again, pushing one more day in the memory.
+
+### Some obvious flaws
+
+Dividend
+News
+Order passed?
+no fundamental
+cost of transaction
+market mood varies (the fear index) ... we will try to mitigate that one.
+
+### Training and (hyper)parameters tuning
+
+We can get 730days worth of 1h candle from the yfinance library.
+Train and Validation set on first 200 days (a bit less than a year ~252days).
+Cut in 5/6 1/6.
+Shuffle or not => not Shuffling shows the issue with market mood.
+Fine tune lr, dropout,n candles obsserved, filter lenght, holding time.
+Pretrain the model.
+Dropout might be too high, second model with lower one.
+
+Then we play on 50 days (to add up to a year beacause why not).
+Only train the last fully convoluted layer.
+Fine tune, dropout, memory size, lr, epoch.
+
+### Big leap, test with chosen parameters
+
+MEH.
+More tuning with longer holding time and different filter length?
+How to get a CNN that is better at generalizing? Scale down or dramattically scale up?
+Try to train without shuffle this time and fine tune with this. 
+The output is too manichean, if the relative variation between the stocks is negligible (which should happen often?) training will force the NN to chose a side. This favorise fiiting situations that are not interresting.
+Let's try to mitigate that.
+
+### Trying to extract relative performance
+
+Relative performance theoretically (but not practically) varies between -infty and +infty.
+Transform this into 0,1.
+tanh is a good candidate but what whould be the slope?
+Naturally the CDF comes to mind.
+Gives a optimal projected spacing on the 0,1 interval for all my states.
+Indeed if too sharp, all 0 or all 1.
+If not enough sharp, all projected on ~0.5.
+
+
 
 This program is started from the command line by calling:
 
