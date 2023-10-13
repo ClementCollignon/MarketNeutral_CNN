@@ -38,7 +38,7 @@ And arbitrarily, we always open/close positions at 10:30am at the close of the f
 The achitecture of the network is shown below, you can also ave a look at the [code](neuralnet.py).
 
 <p align = "center">
-<img src="images\neuralnet.PNG" width = 700>
+<img src="images\neuralnet_architecture.PNG" width = 700>
 </p>
 
 ## How do we play?
