@@ -109,7 +109,7 @@ The dropout might be still even too high as the train data underperform the vali
 Now we use the 50 remaining days of the year to do a mock play (see [script](trading_opti.py)).
 The goal here is to optimize the parameters to get the best Sharpe ratio in a more concrete situation.
 This time, we only train the last fully convoluted layer as the size of the memory will be limited.
-The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times sqrt(50) to give a yearly like Sharpe ratio (even if that's not entirely accurate).
+The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times $\sqrt{50}$ to give a yearly like Sharpe ratio (even if that's not entirely accurate).
 50 days is a short periode of time to evaluate our models. But it takes already 10 minutes per play on the hardware I have.
 We could finetune during this step the dropout, learning rate but also the memory size, and the number of epochs for training each day.
 
@@ -145,15 +145,18 @@ We can try to address that problematic by outputting the relative variation betw
 
 ## Trying to extract relative performance
 
-Relative performance theoretically (but not practically) varies between -infty and +infty.
-Transform this into 0,1.
-tanh is a good candidate but what whould be the slope?
-Naturally the CDF comes to mind.
-Gives a optimal projected spacing on the 0,1 interval for all my states.
-Indeed if too sharp, all 0 or all 1.
-If not enough sharp, all projected on ~0.5.
+Let's call $\Delta x = x_1 - x_0$ the relaive variation between stocks 1 and 0.
+In principle, $\Delta x$ is in the interval $[-\infty, +\infty]$.
+This is not a great range for a neural network output, we hence need to project it to the $[0,1]$ interval.
+We can use a $P(\Delta x) = 1/2 \times (1 + \tanh(slope\times \Delta x))$ for this purpose, but what about the slope?
+If the slope is too steep, all projections will be either 0 or 1. If it's too gentle then all projections will be close to 0.5.
 
-Let's take the same NN, at the output, two values to which I take the softmax which gives a two values whose some = 1 and that belongs to [0,1]. We can look only at the first of those two.
-My loss whould compare this value to the projected relative performance which is also between 0 and 1.
-To have a good gradient for my backpropagation during training, I want optimally a loss that will gives me 0 when the softmax is equal to the relative variation and infinity when it's the distance between the two is the largest (i.e. 1).
-ln(1-|softmax - projected relative variation|) has all the good properties. 
+We should compare our function with the cumulative distribution funtion of the relative daily variation between two stocks. Of course it will vary depending on the pair of stocks chosen. A slope of 10 gives us a good compromise and let us the hope to find variations in the -0.1, 0.1 range. The figure below compares that function with the CDF of the relative daily variation on 4 pairs of stocks.
+
+<p align = "center">
+<img src="images/CDF.PNG" height=250>
+</p>
+
+We can take the same NN, and apply a softmax to the output to get a value that belongs to [0,1]. We can then compare this value to the real $\Delta x$ which is also between 0 and 1.
+To have a good gradient for my backpropagation during training, we want optimally a loss that will gives us 0 when the softmax is equal to the relative variation and infinity when the distance between the two is the largest (i.e. 1). Taking the log,
+$\ln(1-|prediction - P(\Delta x)|)$ we get all the good properties.
