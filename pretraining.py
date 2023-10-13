@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 if __name__ == "__main__":
-    log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\trainingnoshuffle55.csv"
+    log = r"hyperparam_opti\trainingnoshuffle55.csv"
     path_NN = "Nets/Net1"
     days_in_memory = 200
     filter_length = 3

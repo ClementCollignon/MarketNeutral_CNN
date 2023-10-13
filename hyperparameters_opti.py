@@ -9,7 +9,7 @@ def loguniform(low=0, high=1):
     return np.power(10, np.random.uniform(low, high))
 
 if __name__ == "__main__":
-    log = r"C:\Users\Dodo\Documents\git\MarketNeutral_CNN\hyperparam_opti\candles.csv"
+    log = r"hyperparam_opti\candles.csv"
 
     with open(log, 'w') as file:
         file.write("#number of candles\thold time\tdoprout\tlr\ttrain loss\ttrain acc\tval loss\tval acc\n")
