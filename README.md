@@ -90,7 +90,7 @@ See below some examples with the loss ploted as a function of the dropout for th
 <img src="images/shuffled_dropouts.PNG" height=250>
 </p>
 
-By varying randomly the dropout, learning rate and the number of observed candles, we look for the optimal parameters.
+By varying randomly the dropout, learning rate and the number of observed candles, [we look for the optimal parameters](https://www.cnn.com/markets/fear-and-greed).
 Based on the above right figure, we go for a the highest possible drop rate (dr = 0.55) to introduce as much noise as possible and avoid overfitting on particular features. We will also train another network with a lower dropout rate (dr = 0.35) as 0.55 might be overkill. The same way we also get an optimal learning rate of about 1.5e-4.  
 With this settle we now solely vary the number of observed candles and find an optimal number that seems to be around 8.
 We can now train our model.
