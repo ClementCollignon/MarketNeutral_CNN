@@ -228,3 +228,11 @@ class Trader(object):
     def write(self, day, dist):
         with open(self.wallet_log, 'a') as file:
             file.write(f"{day}\t{self.wallet}\t{dist}\n")
+
+    def save(self, save_path):
+        torch.save(
+            dict(model=self.net.state_dict()),
+            save_path,
+        )
+        
+        print(f"Net saved to {save_path}")
