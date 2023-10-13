@@ -16,7 +16,7 @@ Can I feed the candle charts for 'stock0' and 'stock1' to a CNN and output 0 (1)
 Let's start by chosing a sector, in our case, residential REIT stocks listed in the US.
 We then select the 10 most traded stocks and download the historical data with Open, Close, High, Low and Volume (OCHLV) values for the one hour, one day, and one week candles ([data_extraction.py](data_extraction.py) helps with the task).
 
-We can then translate these OCHLV data into visual candle charts, in the form of torch tensors, as in the figure below. 
+We can then translate these OCHLV data into visual candle charts, in the form of torch tensors, as in the figure below ( [you can plot your own](plot_candles.py)). 
 And we can stack those tensors for a pair a stock.
 Practically, we have the 1h, 1d and 1week andle charts for the pair of stocks so that we end up with 6 channels in pytorch nomenclature.
 The height is fixed to 144 pixels (so that at least the height allows 4 2x2 maxpools and/or 2 3x3 ones).
@@ -35,7 +35,11 @@ We need to give this scaling factor to the CNN to give it chance at infering the
 In a nutshell, the CNN take as input the stack of candles and the scaling values and output 0 or 1 depending on wether stock 0 or stock 1 is the one overperforming over the next 24h.  
 And arbitrarily, we always open/close positions at 10:30am at the close of the first 1h candle of the day, this should be considered a parameter, but the parameter space is already enormous.
 
-The achitecture of the network is shown below, you can also ave a look at the [code](neuralnet.py) helps with the task
+The achitecture of the network is shown below, you can also ave a look at the [code](neuralnet.py).
+
+<p align = "center">
+<img src="images\neuralnet_architecture.PNG" width = 700>
+</p>
 
 
 ## How do we play?
@@ -97,46 +101,3 @@ Let's take the same NN, at the output, two values to which I take the softmax wh
 My loss whould compare this value to the projected relative performance which is also between 0 and 1.
 To have a good gradient for my backpropagation during training, I want optimally a loss that will gives me 0 when the softmax is equal to the relative variation and infinity when it's the distance between the two is the largest (i.e. 1).
 ln(1-|softmax - projected relative variation|) has all the good properties. 
-
-
-
-This program is started from the command line by calling:
-
-```
-python flake-segmentation-tool.py --image_size image_size --image_folder images --output_folder output --num_classes num_classes
-```
-
-The `image_size` argument sets the width of the image (in pixels) when displayed in the GUI annotation window, `image_folder` is the path to the images to be annotated, `output_folder` is the path to save annotations and segmentations, and `num_classes` is the number of possible classes. Segmentations are saved as grayscale uint8 images with each pixel value proportional to the assigned class number. Starting the program opens four windows. The first image in the folder will be displayed in the annotation window:
-
-<p align = "center">
-<img src="screens/main_window.png" width=500>
-</p>
-
-Across the top there are buttons to increment through the images in the folder, and the "Go to Image" button loads an image selected by the nubmer in the the adjacent box. There are also options to save the labels and segmentations for a given image. The "Save Image" button allows the user to save the image with any transformations that have been applied. The class toggle buttons across the top indicate the presence or absence of the classes. Basic image-manipulation functions are controlled by the background tools window:
-
-<p align = "center">
-<img src="screens/background_tools.png" width=200>
-</p>
-
-"Background points" are added by the user by ctrl+clicking on the image. They need to be added in pairs defining lines. The pixels values along these lines are sampled and used to fit a quadratic illumnation profile common to microscope images; the illumnation profile is divided out by clicking "Subtract Background". Clicking white balance applies a factor to each channel so that the average color of the background points is (127, 127, 127). If no background points are selected, it sets the median color to (127, 127, 127). "Clip" clips all channel values at "Clip min" and "Clip max" and rescales the resulting values to lie between 0 and 255.
-
-The segmentation tools windows has options for auto-segmentation:
-<p align = "center">
-<img src="screens/segmentation_tools.png" width=200>
-</p>
-
-The basic method for segmentation is user defined polygons (vertices created by left clicking). The polygons are completed by clicking "Close Poly". The "Active Class" box determines the class of any segmentations. In addition, there are several "hyperparameters" that control what happens when the user clicks "Auto Segmentation". The "Filter Size" parameter controls the size of a box averaging filter applied to the image before any other auto-segmentation operations. The simplest auto-segmentation operation is to send all pixels with color values in a selected range to the active class. This range can be entered directly in the "Color range min" and "Color range max" boxes, or automatically determined using "Dropper points". To use dropper points, shift+right click on the desired regions, then press "Color range from selection". Checking the "Color range to class" box then clicking "Auto Segmentation" creates the segmentation:
-
-<p align = "center">
-<img src="screens/segmentation_1.png" width=500>
-</p>
-
-The is also a fuzzy select algorithm using flood fill. The fill points are selected by shift-clicking. The tolerance parameter determines how large the difference bewtween adjacent pixels needs to be to stop the flood. Clicking "Auto Segmentation" applies both the color-range-to-class and any flood fills for the active class:
-
-<p align = "center">
-<img src="screens/segmentation_2.png" width=500>
-</p>
-
-There a few more parameters that we can use to control the auto-segmentation. "Class pooling size" controls the size of a square max-pooling element applied to the segmentation. This is applied to the color-range-to-class and flood fill segmentation masks, but not the polygons. Checking "Background exclusion" modifies the flood fill algorithm by attempting to further exclude background regions from the flood (beyond what is achieved by the threshold parameter). It essentially prevents the flood from entering any region too close in color to the background color (the required difference is set by "Exclusion tolerance"). This allows for larger values of flood tolerance parameter and helps in generating smooth fills with a small number of flood points. 
-
-Finally, the "Key Bindings" window shows a list of hotkeys that can be used to operate the segementation tool.
