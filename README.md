@@ -72,17 +72,26 @@ To mitigate this last issue we will put a limit on the size of the memory and tr
 
 ## Training and (hyper)parameters tuning
 
-We can get 730days worth of 1h candle from the yfinance library.
-Train and Validation set on first 200 days (a bit less than a year ~252days).
-Cut in 5/6 1/6.
-Shuffle or not => not Shuffling shows the issue with market mood.
-Fine tune lr, dropout,n candles obsserved, filter lenght, holding time.
-Pretrain the model.
-Dropout might be too high, second model with lower one.
+The yfinance library allows us to get 730 days worth of 1h candles.  
+We can cut this in 250 days for training which is roughly a year of data.
+And we can use the rest for testing. This is mostly because training is time consuming and I have a limited amount of time.
 
-Then we play on 50 days (to add up to a year beacause why not).
-Only train the last fully convoluted layer.
-Fine tune, dropout, memory size, lr, epoch.
+Of these 250 days we will take 200 days to train the whole neural network and finetune the hyperparameters and the other ones.
+Namely the learning rate, dropout, filter length, but also the holding time and the number of observed candles.
+Once again, because of the limited amount of time we will fix the holding time to one day to reduce a bit the parameter space.
+
+#### Pretraining on 200 days
+
+We cut those 200 days into a training and validation set. And we have two options. Either shuffling before cutting the dataset or no. If we don't shuffle beforehand, training and validation will be on different periods of time, and we will be subjected to this shifting investor mood issue stated above. It's interresting to see though the night and day difference with and without shuffling the data.
+
+#### Playing on 50 days to tune memory
+
+Now we use the 50 remaining days of the year to do a mock play.
+The goal here is to optimize the parameters to get the best Sharpe ratio in a more concrete situation.
+Here we only train the last fully convoluted layer as the size of the memory will be limited.
+The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times sqrt(50) to give a yearly like Sharpe ratio (even if that's not entirely accurate).
+50 days is a short periode of time to evaluate our models. But it takes already 10 minutes per play on the hardware I have.
+We could finetune during this step the dropout, learning rate but also the memory size, and the number of epochs for training each day.
 
 ## Big leap, test with chosen parameters
 
