@@ -65,6 +65,7 @@ if __name__ == "__main__":
             Mario.reset_brain(dropout,lr)
 
             t0 = time.time()
+            Mario.prepare_loader(shuffle = True)
             Mario.learn()
             print("Time to train",time.time()-t0)
             
