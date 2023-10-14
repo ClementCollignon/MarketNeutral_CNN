@@ -85,7 +85,7 @@ def run(number_of_days_play, days_in_memory, lr, dropout, brain):
         x.append(i)
 
         #Write
-        Mario.write(acc)
+        Mario.write(today,acc)
 
         line1.set_data(x,wallet)
         ax.axis([min(x),max(x)*1.05,min(wallet)*0.95,max(wallet)*1.05])

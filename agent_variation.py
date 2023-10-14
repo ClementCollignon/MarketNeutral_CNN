@@ -24,6 +24,7 @@ class Trader(object):
         self.setup_market(number_of_observed_candles)
         self.setup_memory(days_in_memory)
         self.setup_brain(filter_length, dropout, learning_rate, batch_size, epochs, frozen)
+        self.setup_wallet()
         
     def CDF(self, x):
         return 0.5*(1+torch.tanh(self.slope*x))
@@ -60,6 +61,23 @@ class Trader(object):
         self.loss_val = []
         self.dist_train = []
         self.dist_val = []
+    
+    def setup_wallet(self):
+        self.wallet_log = f"backtests_variation\\Log\\run_{datetime.datetime.now().strftime('%Y_%m_%d_%H%M%S')}.csv"
+        if not os.path.exists(self.wallet_log):
+            with open(self.wallet_log, 'a') as file:
+                (days_in_memory, lr, dropout, brain, threshold) = self.metadata
+                file.write(f"#days in memory: {days_in_memory}\n")
+                file.write(f"#lr: {lr}\n")
+                file.write(f"#dropout: {dropout}\n")
+                file.write(f"#brain: {brain}\n")
+                file.write(f"#threshold: {threshold}\n")
+                file.write(f"#slope: {self.slope}\n")
+                file.write("#day\twallet\tdist\n")
+        self.wallet = 1
+        self.holding = {}
+        for i in range(self.number_of_tickers):
+            self.holding[i] = 0
 
     def reset_brain(self, dropout, learning_rate):
         self.setup_brain(self.filter_length, dropout, learning_rate, self.batch_size, self.epochs, frozen = False)
@@ -97,8 +115,10 @@ class Trader(object):
         states = states.to(device = self.device)
         scales = scales.float()
         scales = scales.to(device = self.device)
-        relative_variations = relative_variations.type(torch.long).to(device = self.device).squeeze()
+        relative_variations = relative_variations.to(device = self.device)
+
         prediction = self.net(states, scales)
+
         prediction = torch.nn.Softmax(1)(prediction)[:,0]
 
         prediction = self.CDF_m1(prediction)
@@ -107,7 +127,14 @@ class Trader(object):
         if check_pred:
             dist = torch.mean(torch.abs(relative_variations - prediction))
 
-        return prediction, dist
+        return prediction, float(dist)
+
+    def prepare_loader_noval(self):
+        pairs, states, scales, relative_variations = map(torch.stack, zip(*self.memory))
+
+        train_ds = torch.utils.data.TensorDataset(states, scales, relative_variations)
+        self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        
 
     def prepare_loader(self, shuffle = True):
         pairs, states, scales, relative_variations = map(torch.stack, zip(*self.memory))
@@ -129,11 +156,11 @@ class Trader(object):
         val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], relative_variations[cut_val:])
         self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
     
-    def train_one_epoch(self, train_loader):
+    def train_one_epoch(self):
         total_loss = 0
         total_dist = []
 
-        for i, data in enumerate(train_loader):
+        for i, data in enumerate(self.train_loader):
             state, scale, relative_variation = data
             state = state.float()
             state = state.to(device = self.device)
@@ -163,7 +190,7 @@ class Trader(object):
 
         total_dist = torch.mean(torch.tensor(total_dist))
 
-        return total_loss/len(train_loader), total_dist
+        return total_loss/len(self.train_loader), total_dist
 
     @torch.no_grad()
     def check_val(self, val_loader):
@@ -216,6 +243,36 @@ class Trader(object):
             self.dist_val.append(dist_val)
 
         return loss_val, dist_val
+    
+    def learn_noval(self):
+        for epoch in range(self.epochs):
+            self.net.train(True)
+            loss_train, dist_train = self.train_one_epoch()
+            print(f"epoch {epoch}: train loss, dist: {np.round(loss_train,4)}, {np.round(dist_train*100,3)}")
+            self.loss_train.append(loss_train)
+            self.dist_train.append(dist_train)
+
+        return loss_train, dist_train
+
+    def act(self, scores, day, threshold):
+        price = self.market.market_price(day)
+
+        for key in self.holding:
+            self.wallet += self.holding[key] * price[key]
+            self.holding[key] = 0
+
+        invest_val = self.wallet/2
+
+        argsort_scores = np.argsort(scores)
+        scores_sorted = scores[argsort_scores]
+
+        max_diff = scores_sorted[-1] - scores_sorted[0]
+        print(f"maximum distance: {max_diff}")
+        if max_diff > threshold:
+            arg_long = argsort_scores[-1]
+            arg_short = argsort_scores[0]
+            self.holding[arg_short] = - invest_val / price[arg_short]
+            self.holding[arg_long] = - invest_val / price[arg_long]
 
     def write(self, day, dist):
         with open(self.wallet_log, 'a') as file:
@@ -228,3 +285,7 @@ class Trader(object):
         )
         
         print(f"Net saved to {save_path}")
+    
+    def load(self, model):
+        chkpt = torch.load(model)
+        self.net.load_state_dict(chkpt['model'])
