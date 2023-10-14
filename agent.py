@@ -89,10 +89,6 @@ class Trader(object):
     def memorize(self, batch):
         self.memory.extend(batch)
     
-    def learn_noval(self):
-        train_loader = self.prepare_loader_noval()
-        loss_train, acc_train = self.train_noval(train_loader)
-        return loss_train, acc_train
             
     @torch.no_grad()
     def predict(self, state, scale):
@@ -173,12 +169,12 @@ class Trader(object):
         val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], best_actions[cut_val:])
         self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
     
-    def train_one_epoch(self, train_loader):
+    def train_one_epoch(self):
         Ngood,Nbad = 0,0
         total_loss = 0
         total_acc = 0
 
-        for i, data in enumerate(train_loader):
+        for i, data in enumerate(self.train_loader):
             state, scale, best_action = data
             state = state.float()
             state = state.to(device = self.device)
@@ -204,15 +200,15 @@ class Trader(object):
 
         total_acc = Ngood/(Ngood+Nbad)
 
-        return total_loss/len(train_loader), total_acc
+        return total_loss/len(self.train_loader), total_acc
 
     @torch.no_grad()
-    def check_val(self, val_loader):
+    def check_val(self):
         self.net.train(False)
         Ngood,Nbad = 0,0
         total_loss = 0
         total_acc = 0
-        for i, data in enumerate(val_loader):
+        for i, data in enumerate(self.val_loader):
             state, scale, best_action = data
             state = state.float()
             state = state.to(device = self.device)
@@ -233,18 +229,18 @@ class Trader(object):
 
         total_acc = Ngood/(Ngood+Nbad)
         
-        return total_loss/len(val_loader) , total_acc
+        return total_loss/len(self.val_loader) , total_acc
 
     def learn(self):
         for epoch in range(self.epochs):
             self.net.train(True)
-            loss_train, acc_train = self.train_one_epoch(self.train_loader)
+            loss_train, acc_train = self.train_one_epoch()
             print(f"epoch {epoch}: train loss, acc: {np.round(loss_train,3)}, {np.round(acc_train,3)}")
             self.loss_train.append(loss_train)
             self.acc_train.append(acc_train)
-    
+            
             self.net.train(False)
-            loss_val, acc_val = self.check_val(self.val_loader)
+            loss_val, acc_val = self.check_val()
             print(f"epoch {epoch}: val    loss, acc: {np.round(loss_val,3)}, {np.round(acc_val,3)}")
             print("____")
             self.loss_val.append(loss_val)
@@ -252,11 +248,10 @@ class Trader(object):
 
         return loss_val, acc_val
 
-    def train_noval(self, train_loader):
-        
+    def learn_noval(self):
         for epoch in range(self.epochs):
             self.net.train(True)
-            loss_train, acc_train = self.train_one_epoch(train_loader)
+            loss_train, acc_train = self.train_one_epoch()
             print(f"epoch {epoch}: train loss, acc: {np.round(loss_train,3)}, {np.round(acc_train,3)}")
             self.loss_train.append(loss_train)
             self.acc_train.append(acc_train)

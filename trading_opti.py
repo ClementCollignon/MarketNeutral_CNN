@@ -58,7 +58,8 @@ def run(number_of_days_play, days_in_memory, lr, dropout, brain):
             continue
         
         #Learn
-        loss_train, acc_train = Mario.learn_noval()
+        Mario.prepare_loader_noval()
+        Mario.learn_noval()
     
         #Observe, Predict, and Act for today
         day_batch = Mario.observe_past(today, tomorrow)
