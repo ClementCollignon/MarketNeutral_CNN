@@ -107,7 +107,7 @@ We can now train our model.
 Now we use the 50 remaining days of the year to do a mock play (see [script](trading_opti.py)).
 The goal here is to optimize the parameters to get the best Sharpe ratio in a more concrete situation.
 This time, we only train the last fully convoluted layer as the size of the memory will be limited.
-The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times $\sqrt{50}$ to give a yearly like Sharpe ratio (even if that's not entirely accurate).
+The Sharpe ratio is then computed as the mean over the standard deviation of the daily returns times $\sqrt{50}$ to give a yearly like Sharpe ratio (even if that's not entirely accurate, see [this paper](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=05561b77acfdd034a585c32048819cc9ba6d1434) from Andre Lo).
 50 days is a short period of time to evaluate our models. But it takes already 10 minutes per play on the hardware I have.
 We could finetune during this step the dropout, learning rate but also the memory size, and the number of epochs for training each day.
 
@@ -142,7 +142,7 @@ Using another architecture is another avenue, by either scaling down or scaling 
 
 Now the maybe more obvious issue is that the output of the CNN is too Manichean.
 If the relative variation between the stocks is small training will still force the NN to choose a side and that might be detrimental. We want the neuralnet to be undecided when variation is small and certain when variation is large.
-We can try to address that problematic by outputting the relative variation between the stocks instead of the best action to take.
+We can try to address that problematic by outputting the relative variation between the stocks instead of the best action to take (Or we could simply add another output to the CNN, I'll explore that later on).
 
 ## Predicting relative performance
 
