@@ -141,13 +141,12 @@ class Trader(object):
         for key in self.holding:
             self.wallet += self.holding[key] * price[key]
 
-    def prepare_loader_noval(self, shuffle = True):
+    def prepare_loader_noval(self):
         pairs, states, scales, best_actions = map(torch.stack, zip(*self.memory))
 
         train_ds = torch.utils.data.TensorDataset(states, scales, best_actions)
-        train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
 
-        return train_loader
 
     def prepare_loader(self, shuffle = True):
         pairs, states, scales, best_actions = map(torch.stack, zip(*self.memory))
