@@ -126,6 +126,8 @@ class Trader(object):
         dist = 1
         if check_pred:
             dist = torch.mean(torch.abs(relative_variations - prediction))
+            max_gain = relative_variations.max() - relative_variations.min()
+            print(f"maximum gain = {float(max_gain)*100} %")
 
         return prediction, float(dist)
 
@@ -147,7 +149,7 @@ class Trader(object):
             scales = scales[shuffle_ind]
             relative_variations = relative_variations[shuffle_ind]
 
-        cut_val = int(int(len(self.memory)) * 5/6)
+        cut_val = int(int(len(self.memory)) * 3/4)
 
         #here I fit on the last 2/3 and check on the first 1/3
         train_ds = torch.utils.data.TensorDataset(states[:cut_val], scales[:cut_val], relative_variations[:cut_val])
@@ -155,6 +157,13 @@ class Trader(object):
         
         val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], relative_variations[cut_val:])
         self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+
+        # cut_val = 5 * 90
+        # train_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], relative_variations[cut_val:])
+        # self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
+        
+        # val_ds = torch.utils.data.TensorDataset(states[:cut_val], scales[:cut_val], relative_variations[:cut_val])
+        # self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
     
     def train_one_epoch(self):
         total_loss = 0
@@ -230,7 +239,7 @@ class Trader(object):
     def learn(self):
         for epoch in range(self.epochs):
             self.net.train(True)
-            loss_train, dist_train = self.train_one_epoch(self.train_loader)
+            loss_train, dist_train = self.train_one_epoch()
             print(f"epoch {epoch}: train loss, dist: {np.round(loss_train,4)}, {np.round(dist_train*100,3)}")
             self.loss_train.append(loss_train)
             self.dist_train.append(dist_train)
@@ -265,14 +274,15 @@ class Trader(object):
 
         argsort_scores = np.argsort(scores)
         scores_sorted = scores[argsort_scores]
+        n_pairs = (self.number_of_tickers - 1)
+        max_diff = (scores_sorted[-1] - scores_sorted[0]) / n_pairs
+        print(f"gain predicted: {np.round(max_diff*100,2)}%")
 
-        max_diff = scores_sorted[-1] - scores_sorted[0]
-        print(f"maximum distance: {max_diff}")
         if max_diff > threshold:
             arg_long = argsort_scores[-1]
             arg_short = argsort_scores[0]
             self.holding[arg_short] = - invest_val / price[arg_short]
-            self.holding[arg_long] = - invest_val / price[arg_long]
+            self.holding[arg_long] = + invest_val / price[arg_long]
 
     def write(self, day, dist):
         with open(self.wallet_log, 'a') as file:
