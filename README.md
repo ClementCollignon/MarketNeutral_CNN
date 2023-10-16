@@ -11,6 +11,8 @@ The idea is then simple, can I feed a few candle charts to a CNN and get as outp
 As I want to have a market neutral strategy, let's reformulate:  
 Can I feed the candle charts for 'stock0' and 'stock1' to a CNN and output 0 (1) if stock0 (stock1) outperforms?
 
+In the second part, I will try to predict directly the relative performance between the two stocks to avoid "force-fitting" together cases that are extremely dissimilar. For instance cases where the relative performance of stock 1 over stock 0 would be 0.001% and 4%.
+
 ## Table of Contents
 
 - [The Idea](#the-idea)
