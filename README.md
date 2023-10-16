@@ -11,7 +11,16 @@ The idea is then simple, can I feed a few candle charts to a CNN and get as outp
 As I want to have a market neutral strategy, let's reformulate:  
 Can I feed the candle charts for 'stock0' and 'stock1' to a CNN and output 0 (1) if stock0 (stock1) outperforms?
 
-## The idea
+## Table of Contents
+
+- [The Idea](#the-idea)
+- [How to Play?](#how-to-play)
+- [Preliminary Remarks: Some Obvious Flaws](#preliminary-remarks-some-obvious-flaws)
+- [Training and (hyper)Parameters Tuning](#training-and-(hyper)parameters-tuning)
+- [Final Test](#final-test)
+- [Continuous Output: Predicting Relative Performance](#continuous-output-predicting-relative-performance)
+
+## The Idea
 
 Let's start by choosing a sector, in our case, residential REIT stocks listed in the US.
 We then select the 10 most traded stocks and download the historical data with Open, Close, High, Low and Volume (OCHLV) values for the one hour, one day, and one week candles ([data_extraction.py](data_extraction.py) helps with the task).
@@ -41,7 +50,7 @@ The architecture  of the network is shown below, you can also have a look at the
 <img src="images\neuralnet.PNG" width = 700>
 </p>
 
-## How do we play?
+## How to Play?
 
 #### We have an [agent](agent.py) with the following characteritics:  
 + A memory to store the stacks of candle charts and the best actions that should be taken for each pair of stocks.
@@ -58,7 +67,7 @@ The architecture  of the network is shown below, you can also have a look at the
 6. Then he moves on to the next day, close both long and short positions and starts again, pushing one more day in the memory.
 The memory may have a maximum length.
 
-## Some obvious flaws
+## Preliminary Remarks: Some Obvious Flaws
 
 + Dividends are not taken into account in all of this. And to make things even more sketchy, they are included in yfinance 1d and 1week candles but not in the hourly ones.
 + We are obviously oblivious to any news: unexpected event, earning days ... (we could maybe avoid holding across earning days to mitigate that).
@@ -70,7 +79,7 @@ Reaction to a given chart won't be the same in September 2021 and March 2022 (th
 
 To mitigate this last issue, we will put a limit on the size of the memory and train only the last fully convoluted layer during play time. More details on this are given below.
 
-## Training and (hyper)parameters tuning
+## Training and (hyper)Parameters Tuning
 
 The yfinance library allows us to get 730 days' worth of 1h candles.  
 We can cut this in 250 days for training which is roughly a year of data.
@@ -80,7 +89,7 @@ Of these 250 days we will take 200 days to train the whole neural network and fi
 Namely the learning rate, dropout, filter length, but also the holding time and the number of observed candles.
 Once again, because of the limited amount of time we will fix the holding time to one day to reduce a bit the parameter space.
 
-#### Pretraining on 200 days
+#### Pretraining on 200 Days
 
 We cut those 200 days into a training and validation set. And we have two options. Either shuffling before cutting the dataset or no. If we don't shuffle beforehand, training and validation will be on different periods of time, and we will be subjected to this shifting investor mood issue stated above. It's interresting to see though the night and day difference with and without shuffling the data.
 See below some examples with the loss plotted as a function of the dropout for the shuffled and unshuffled cases. The unshuffled validation data cannot go below $\ln(2)$.
@@ -102,7 +111,7 @@ We can now train our model.
 <img src="images/pretrain_acc_055.PNG" height=150>
 </p>
 
-#### Playing on 50 days to tune memory
+#### Playing on 50 Days to Tune Memory Size
 
 Now we use the 50 remaining days of the year to do a mock play (see [script](trading_opti.py)).
 The goal here is to optimize the parameters to get the best Sharpe ratio in a more concrete situation.
@@ -121,7 +130,7 @@ All in all keeping 15 days in memory might be a reasonnable.
 It's quite noteworthy that the Sharpe ratio declines with increasing memory size.
 The decline after 15 days may hint at a typical time scale of 3 weeks for market mood? But once again the noise level is quite high here.
 
-## Big leap, test with chosen parameters
+## Final Test
 
 Finaly we set our tuned parameters and start to play.
 We use both pretrained models with dropout rates of 0.35 and 0.55.
@@ -144,7 +153,7 @@ Now the maybe more obvious issue is that the output of the CNN is too Manichean.
 If the relative variation between the stocks is small training will still force the NN to choose a side and that might be detrimental. We want the neuralnet to be undecided when variation is small and certain when variation is large.
 We can try to address that problematic by outputting the relative variation between the stocks instead of the best action to take (Or we could simply add another output to the CNN, I'll explore that later on).
 
-## Predicting relative performance
+## Continuous Output: Predicting Relative Performance
 
 Let's call $\Delta x = x_1 - x_0$ the relative variation between stocks 1 and 0. With $x_1$ and $x_0$ the variations of stocks 1 and 0.
 In principle, $\Delta x$ is in the interval $[-\infty, +\infty]$.
