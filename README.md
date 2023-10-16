@@ -167,10 +167,25 @@ We can implement a variant of the agent in [agent_variation.py](agent_variation.
 ### Hyperparameters tuning
 
 We can start by tuning the hyper parameters. We apply the same procdure, chosing random values of learning rate, dropout and slope at each iteration.
+
 <p align = "center">
 <img src="images/tune_lr.PNG" height=175>
 <img src="images/tune_dropout.PNG" height=175>
 <img src="images/tune_slope.PNG" height=175>
 </p>
 
-We chose a learning rate of $5.5 10^{-5}$ dropout of 0.20 and a slope of 8.
+We chose a learning rate of $5 10^{-5}$ dropout of 0.20 and a slope of 8.  
+
+### Sanity check
+
+We can do a quick sanity check to make sure that the model can actually fit.
+Let's fit the first 200 days data and then start trading on those same days with the trained model.
+Below, one can see the training plots (validation is done with preshuffling), a screen shot of some random samples of the predicted gain vs the maximum gain for the day during a trading run, and the evolution of the wallet during the trading run. On the range where the model is fitted the accuracy is almost perfect (which is already a small win), but it becomes quite erratic when we go out of the fitting range, which means that the CNN cannot generalize well. We note that we still got some positive performance, but that could be luck.
+
+<p align = "center">
+<img src="images/pretrain_variation.PNG" height=200>
+<img src="images/capture_gain_predicted.PNG" height=200>
+<img src="images/wallet_test.PNG" height=200>
+</p>
+
+The first approach we will try will be to not shuffle the dataset before cutting it. We will leave 1/8 at the begining of the time serie and 1/8 at the end, and then try to optimize the hyperparameters to minimize the loss on the validation set.

@@ -8,30 +8,32 @@ def loguniform(low=0, high=1):
     return np.power(10, np.random.uniform(low, high))
 
 if __name__ == "__main__":
-    log = r"hyperparam_opti_variation\rough.csv"
+    log = "hyperparam_opti_variation/rough5.csv"
 
-    # with open(log, 'w') as file:
-    #     file.write("#number of candles\thold time\tdoprout\tlr\tslope\ttrain loss\ttrain dist\tval loss\tval dist\n")
-
-    epochs = 20
-    batch_size = 64
+    epochs = 50
+    batch_size = 90
     holding_time = 1 #day
-    number_of_observed_candles = 8
-    days_in_memory = 250
-    filter_length = 3
-    N = 100
 
-    for i in range(1):
-        dropout = 0.20
-        learning_rate = loguniform(-5,-3)
-        slope = random.uniform(1,20)
+    filter_lengths = [3,5,7,9]
 
-        Mario = Trader(slope, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, frozen = False, metadata = None)
+    
+    N = 10
+
+    for i in range(N):
+        number_of_observed_candles = random.randint(2,40)
+        days_in_memory = 250 #doesn't matter here
+
+        filter_length = 3 #doesn't matter here will be setup later randomly
+        dropout = 0.20 #doesn't matter here will be setup later randomly
+        learning_rate = 1e-4 #doesn't matter here will be setup later randomly
+        slope = 1 #doesn't matter here will be setup later randomly
+
+        Mario = Trader(slope, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, frozen = False, metadata = (0, 0, 0, "",0))
         days = Mario.market.get_available_days()
         Ndays_skip = int(number_of_observed_candles / 7) + 1
         print(f"skip {Ndays_skip} days to have at least {number_of_observed_candles} 1h candles in the past")
 
-        Ndays = 50
+        Ndays = 200
         counter = 0
 
         t0 = time.time()
@@ -45,23 +47,27 @@ if __name__ == "__main__":
         print("Time to aggregate 100 days:", time.time()-t0)
 
         for j in range(N):
-            dropout = random.uniform(0.1,0.5)
-            learning_rate = loguniform(-5,-3)
+            dropout = random.uniform(0,1)
+            learning_rate = loguniform(-8,-3)
             slope = random.uniform(1,20)
+            filter_length = random.choice(filter_lengths)
             
             print("####")
+            print("number of observed candles:", number_of_observed_candles)
+            print("filter length:", filter_length)
             print("lr:", learning_rate)
             print("dropout:", dropout)
             print("slope:", slope)
             print("####")
 
-            Mario.reset_brain(dropout,learning_rate)
+            Mario.reset_brain(dropout,learning_rate, slope, filter_length)
 
             t0 = time.time()
+            Mario.prepare_loader(shuffle=False)
             Mario.learn()
             print("Time to train",time.time()-t0)
             
             with open(log, 'a') as file:
-                file.write(f"{number_of_observed_candles}\t{holding_time}\t{dropout}\t{learning_rate}\t{slope}\t{Mario.loss_train[-1]}\t{Mario.dist_train[-1]}\t{Mario.loss_val[-1]}\t{Mario.dist_val[-1]}\n")
+                file.write(f"{number_of_observed_candles}\t{filter_length}\t{holding_time}\t{dropout}\t{learning_rate}\t{slope}\t{np.min(Mario.loss_train)}\t{np.min(Mario.dist_train)}\t{np.min(Mario.loss_val)}\t{np.min(Mario.dist_val)}\n")
     
     

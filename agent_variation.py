@@ -79,8 +79,10 @@ class Trader(object):
         for i in range(self.number_of_tickers):
             self.holding[i] = 0
 
-    def reset_brain(self, dropout, learning_rate):
+    def reset_brain(self, dropout, learning_rate, slope, filter_length):
+        self.filter_length = filter_length
         self.setup_brain(self.filter_length, dropout, learning_rate, self.batch_size, self.epochs, frozen = False)
+        self.slope = slope
 
     def observe_past(self, day_open_position, day_close_position, Troubleshoot = False):
         batch = self.market.get_state_relative_variation(day_open_position, day_close_position, Troubleshoot)
@@ -149,13 +151,20 @@ class Trader(object):
             scales = scales[shuffle_ind]
             relative_variations = relative_variations[shuffle_ind]
 
-        cut_val = int(int(len(self.memory)) * 3/4)
+        # cut_val = int(int(len(self.memory)) * 3/4)
+        cut1 = int(len(self.memory) * 1/8)
+        cut2 = int(len(self.memory) * 7/8)
+
 
         #here I fit on the last 2/3 and check on the first 1/3
-        train_ds = torch.utils.data.TensorDataset(states[:cut_val], scales[:cut_val], relative_variations[:cut_val])
+        train_ds = torch.utils.data.TensorDataset(states[cut1:cut2], scales[cut1:cut2], relative_variations[cut1:cut2])
         self.train_loader = torch.utils.data.DataLoader(train_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
         
-        val_ds = torch.utils.data.TensorDataset(states[cut_val:], scales[cut_val:], relative_variations[cut_val:])
+        states_val = torch.cat((states[:cut1], states[cut2:]), dim = 0)
+        scales_val = torch.cat((scales[:cut1], scales[cut2:]), dim = 0)
+        relative_variations_val = torch.cat((relative_variations[:cut1], relative_variations[cut2:]), dim = 0)
+
+        val_ds = torch.utils.data.TensorDataset(states_val, scales_val, relative_variations_val)
         self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
 
         # cut_val = 5 * 90
