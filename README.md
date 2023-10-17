@@ -21,6 +21,7 @@ In the second part, I will try to predict directly the relative performance betw
 - [Training and (hyper)Parameters Tuning](#training-and-(hyper)parameters-tuning)
 - [Final Test](#final-test)
 - [Continuous Output: Predicting Relative Performance](#continuous-output-predicting-relative-performance)
+- [Final Result](#final-result)
 
 ## The Idea
 
@@ -199,7 +200,9 @@ Below, one can see the training plots (validation is done with preshuffling), a 
 <img src="images/wallet_test.PNG" height=200>
 </p>
 
-The first approach will be to not shuffle the dataset before cutting it. We will leave 1/8 at the begining of the time serie and 1/8 at the end, and then try to optimize the hyperparameters to minimize the loss on the validation set. Unfortunately it seems that a decent enough generalization cannot be achieved.
+## Final Result
+
+The first approach will be to not shuffle the dataset before cutting it. We will leave 1/8 at the beginning of the time series and 1/8 at the end, and then try to optimize the hyperparameters to minimize the loss on the validation set. Unfortunately, it seems that a decent enough generalization cannot be achieved.
 
 We hence switch gear and go back to our previous model.
 Now we can think again of our previous observation that market mood is swinging with a momentum of the order of a few weeks.
@@ -217,4 +220,4 @@ In blue, we follow the prediction of the CNN, in red we go opposite following th
 <img src="images/final_test_variation.PNG" width=500>
 </p>
 
-This gives us a sharpe ratio of $\sim 1.6$ over the first year and $\sim 1$ over the last year.
+This gives us a Sharpe ratio of $\sim 1.6$ over the first year and $\sim 1$ over the last year.
