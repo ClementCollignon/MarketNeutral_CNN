@@ -164,6 +164,8 @@ class Trader(object):
         scales_val = torch.cat((scales[:cut1], scales[cut2:]), dim = 0)
         relative_variations_val = torch.cat((relative_variations[:cut1], relative_variations[cut2:]), dim = 0)
 
+        print(relative_variations_val.std())
+
         val_ds = torch.utils.data.TensorDataset(states_val, scales_val, relative_variations_val)
         self.val_loader = torch.utils.data.DataLoader(val_ds, batch_size=self.batch_size, shuffle=True, num_workers=1)
 

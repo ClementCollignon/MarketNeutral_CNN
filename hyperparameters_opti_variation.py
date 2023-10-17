@@ -8,7 +8,7 @@ def loguniform(low=0, high=1):
     return np.power(10, np.random.uniform(low, high))
 
 if __name__ == "__main__":
-    log = "hyperparam_opti_variation/fine_3.csv"
+    log = "hyperparam_opti_variation/fine2.csv"
 
     epochs = 20
     batch_size = 90
