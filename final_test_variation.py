@@ -6,6 +6,7 @@ from collections import deque
 
 if __name__ == "__main__":
     brain = "Nets/Net_var1/full_shuffle_epoch852.chkpt"
+    save_path_polarity = "backtests_variation/Log/polarity.csv"
     
     number_of_days_play = 1000
 
@@ -110,3 +111,6 @@ if __name__ == "__main__":
 
         if i > day0 - days_in_memory:
             Mario.epochs = 1
+        
+        with open(save_path_polarity, 'a') as file:
+                file.write(f"{i}\t{polarity}\n")
