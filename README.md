@@ -199,4 +199,14 @@ Below, one can see the training plots (validation is done with preshuffling), a 
 <img src="images/wallet_test.PNG" height=200>
 </p>
 
-The first approach we will try will be to not shuffle the dataset before cutting it. We will leave 1/8 at the begining of the time serie and 1/8 at the end, and then try to optimize the hyperparameters to minimize the loss on the validation set.
+The first approach will be to not shuffle the dataset before cutting it. We will leave 1/8 at the begining of the time serie and 1/8 at the end, and then try to optimize the hyperparameters to minimize the loss on the validation set. Unfortunately it seems that a decent enough generalization cannot be achieved.
+
+We hence switch gear and go back to our previous model.
+Now we can think again of our previous observation that market mood is swinging with a momentum of the order of a few weeks.
+Our assumption is that the model will either capture well the market and we should use it, or the model do not capture the market and we should do the opposite of what it predicts.
+
+We can store the daily variation of the wallet over the last 10 trading days (so 2 weeks) in a deque.
+If the CNN is mostly right, the sum will be positive, if it is mostly wrong, we go contrarian and invest the opposite way (in this case we have to change also the signs of all the previously stored values in the deque).
+
+
+

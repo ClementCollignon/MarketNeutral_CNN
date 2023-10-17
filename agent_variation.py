@@ -272,7 +272,7 @@ class Trader(object):
 
         return loss_train, dist_train
 
-    def act(self, scores, day, threshold):
+    def act(self, scores, day, threshold, polarity):
         price = self.market.market_price(day)
 
         for key in self.holding:
@@ -285,13 +285,13 @@ class Trader(object):
         scores_sorted = scores[argsort_scores]
         n_pairs = (self.number_of_tickers - 1)
         max_diff = (scores_sorted[-1] - scores_sorted[0]) / n_pairs
-        print(f"gain predicted: {np.round(max_diff*100,2)}%")
+        print(f"max gain predicted: {np.round(max_diff*100,2)}%")
 
         if max_diff > threshold:
             arg_long = argsort_scores[-1]
             arg_short = argsort_scores[0]
-            self.holding[arg_short] = - invest_val / price[arg_short]
-            self.holding[arg_long] = + invest_val / price[arg_long]
+            self.holding[arg_short] = - polarity * invest_val / price[arg_short]
+            self.holding[arg_long] = + polarity * invest_val / price[arg_long]
 
     def write(self, day, dist):
         with open(self.wallet_log, 'a') as file:
