@@ -209,5 +209,6 @@ We can store the daily variation of the wallet over the last 10 trading days (so
 If the CNN is mostly right, the sum will be positive, if it is mostly wrong, we go contrarian and invest the opposite way (in this case we have to change also the signs of all the previously stored values in the deque).
 
 This is more straightforward to implement, and also more intuitive than refitting the last layer every time.
+See [final test variation](final_test_variation.py) for the implementation.
 
 
