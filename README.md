@@ -216,3 +216,5 @@ In blue, we follow the prediction of the CNN, in red we go opposite following th
 <p align = "center">
 <img src="images/final_test_variation.PNG" width=500>
 </p>
+
+This gives us a sharpe ratio of $\sim 1.6$ over the first year and $\sim 1$ over the last year.
