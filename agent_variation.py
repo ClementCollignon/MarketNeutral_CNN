@@ -185,12 +185,12 @@ class Trader(object):
             scale = scale.float()
             scale = scale.to(device = self.device)
             relative_variation = relative_variation.to(device = self.device)
-            relative_variation = self.CDF(relative_variation) #project to [0,1]
+            relative_variation_projected = self.CDF(relative_variation) #project to [0,1]
 
             self.optimizer.zero_grad()
             prediction = self.net(state, scale)
 
-            loss = self.loss_fn(prediction, relative_variation) #prediction is pushed on [0,1] in the loss like for CrossEntropy
+            loss = self.loss_fn(prediction, relative_variation_projected) #prediction is pushed on [0,1] in the loss like for CrossEntropy
 
             loss.backward()
             self.optimizer.step()
@@ -201,8 +201,7 @@ class Trader(object):
 
             #project back to the relative variations:
             prediction = self.CDF_m1(prediction) 
-            true_value = self.CDF_m1(relative_variation)
-            dist = torch.abs( prediction - true_value )
+            dist = torch.abs( prediction - relative_variation )
 
             total_dist.append( torch.mean(dist) )
 
@@ -224,11 +223,11 @@ class Trader(object):
             scale = scale.to(device = self.device)
            
             relative_variation = relative_variation.to(device = self.device)
-            relative_variation = self.CDF(relative_variation) #project to [0,1]
+            relative_variation_projected = self.CDF(relative_variation) #project to [0,1]
 
             prediction = self.net(state, scale)
 
-            loss = self.loss_fn(prediction, relative_variation) 
+            loss = self.loss_fn(prediction, relative_variation_projected) 
             
             total_loss += loss.item()
 
@@ -236,8 +235,7 @@ class Trader(object):
             
             #project back to the relative variations:
             prediction = self.CDF_m1(prediction) 
-            true_value = self.CDF_m1(relative_variation)
-            dist = torch.abs( prediction - true_value )
+            dist = torch.abs( prediction - relative_variation )
 
             total_dist.append( torch.mean(dist) )
 

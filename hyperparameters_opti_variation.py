@@ -8,19 +8,20 @@ def loguniform(low=0, high=1):
     return np.power(10, np.random.uniform(low, high))
 
 if __name__ == "__main__":
-    log = "hyperparam_opti_variation/rough5.csv"
+    log = "hyperparam_opti_variation/fine_3.csv"
 
-    epochs = 50
+    epochs = 20
     batch_size = 90
     holding_time = 1 #day
 
-    filter_lengths = [3,5,7,9]
+    filter_lengths = [9,11,13]
 
     
-    N = 10
+    N = 20
 
     for i in range(N):
-        number_of_observed_candles = random.randint(2,40)
+        number_of_observed_candles_arr = [random.randint(30,35), random.randint(7,9)]
+        number_of_observed_candles = random.choice(number_of_observed_candles_arr)
         days_in_memory = 250 #doesn't matter here
 
         filter_length = 3 #doesn't matter here will be setup later randomly
@@ -31,6 +32,7 @@ if __name__ == "__main__":
         Mario = Trader(slope, holding_time, number_of_observed_candles, days_in_memory, filter_length, dropout, learning_rate, batch_size, epochs, frozen = False, metadata = (0, 0, 0, "",0))
         days = Mario.market.get_available_days()
         Ndays_skip = int(number_of_observed_candles / 7) + 1
+        Ndays_skip = int(40 / 7) + 1
         print(f"skip {Ndays_skip} days to have at least {number_of_observed_candles} 1h candles in the past")
 
         Ndays = 200
@@ -47,9 +49,9 @@ if __name__ == "__main__":
         print("Time to aggregate 100 days:", time.time()-t0)
 
         for j in range(N):
-            dropout = random.uniform(0,1)
-            learning_rate = loguniform(-8,-3)
-            slope = random.uniform(1,20)
+            dropout = random.uniform(0.2,0.9)
+            learning_rate = 5e-7
+            slope = random.uniform(20,40)
             filter_length = random.choice(filter_lengths)
             
             print("####")
