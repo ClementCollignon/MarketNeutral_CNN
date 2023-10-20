@@ -220,4 +220,6 @@ In blue, we follow the prediction of the CNN, in red we go opposite following th
 <img src="images/final_test_variation.PNG" width=500>
 </p>
 
-This gives us a Sharpe ratio of $\sim 1.6$ over the first year and $\sim 1$ over the last year.
+This gives us a Sharpe ratio of $\sim 1.6$ over the first year and $\sim 1$ over the last year.  
+We have to double check that this is not a fluke though.  
+We can check if this work in another sector.
